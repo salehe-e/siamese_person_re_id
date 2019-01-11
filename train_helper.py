@@ -7,7 +7,7 @@ from train_helper import *
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-def make_single_dataset(image_size=[256, 128], tfrecords_path="/home/salehe/siamese/mars/mars_train_00000-of-00001.tfrecord", shuffle_buffer_size=2000, repeat=True, train=True):
+def make_single_dataset(image_size=[256, 128], tfrecords_path="./mars/mars_train_00000-of-00001.tfrecord", shuffle_buffer_size=2000, repeat=True, train=True):
     """
 	Input:
 		image_size: size of input images to network
@@ -105,156 +105,6 @@ def create_filter_func(same_prob, diff_prob):
     return filter_func
 
 
-def conv2d_old(prev, filters, kernel_size, strides=1, padding="SAME", name="conv2d", reuse=False, batch_norm=True, maxpool=True):
-
-    layer = tf.layers.conv2d(prev, filters, [kernel_size, kernel_size], strides=strides, padding=padding,
-        kernel_regularizer=tf.contrib.layers.l2_regularizer(scale=0.1), name=name, reuse=reuse)
-    if maxpool:
-        # layer = tf.layers.max_pooling2d(layer, pool_size=2, strides=2, padding='valid')
-        layer = tf.contrib.layers.max_pool2d(layer, [2, 2], padding='SAME')
-    if batch_norm:
-        layer = tf.layers.batch_normalization(layer, fused=True)
-    layer = tf.nn.relu(layer)
-    return layer
-
-
-def conv2d(prev, filters, kernel_size, strides=1, padding='SAME', name='conv2d', reuse=False, batch_norm=True, maxpool=True):
-
-    # layer = tf.layers.conv2d(prev, filters, [kernel_size, kernel_size], strides=1, padding='SAME',
-    #                          kernel_regularizer=tf.contrib.layers.l2_regularizer(scale=0.1), name=name, reuse=reuse)
-
-    # layer = tf.contrib.layers.conv2d(prev, filters, [kernel_size, kernel_size], activation_fn=tf.nn.relu, padding='SAME',
-    #                                        weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(), reuse=reuse)
-    layer = tf.contrib.layers.conv2d(prev, filters, [kernel_size, kernel_size], activation_fn=None,
-                                     padding='SAME',
-                                     weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(), reuse=reuse)
-
-    layer = tf.contrib.layers.max_pool2d(layer, [2, 2], padding='SAME')
-
-    layer = tf.layers.batch_normalization(layer, fused=True)
-
-    layer = tf.nn.relu(layer)
-
-    return layer
-
-
-def model_old(input_image):
-    """
-	Input:
-		input_image: Tensor of shape (batch_size, image_size, image_size, 3)
-	Returns:
-		Feature Vector of shape
-	"""
-    prev = input_image
-    # filters = [256, 128, 64, 32]
-    filters = [32, 64, 128, 256, 2]
-    # kernel_size = [[7, 7], [5, 5], [3, 3], [1, 1], [1, 1]]
-    kernel_size = [7, 5, 3, 1, 1]
-    print(np.shape(prev))
-    for i in range(5): # 4
-        prev = conv2d(prev=prev, filters=filters[i], kernel_size=kernel_size[i]) # 3
-        print(np.shape(prev))
-    flatten = tf.layers.flatten(prev)
-    print(np.shape(flatten))
-
-    # single_output = tf.layers.dense(flatten, 1024, activation=tf.sigmoid)
-    # print(np.shape(single_output))
-
-
-    # return single_output
-    return flatten
-
-
-def model_correct(input, reuse=False):
-    print(np.shape(input))
-    with tf.name_scope("model"):
-        with tf.variable_scope("conv1") as scope:
-            net = tf.contrib.layers.conv2d(input, 256, [3, 3], activation_fn=None, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            net = tf.layers.batch_normalization(net, fused=True)
-            net = tf.nn.relu(net)
-            print(np.shape(net))
-
-        with tf.variable_scope("conv2") as scope:
-            net = tf.contrib.layers.conv2d(net, 128, [3, 3], activation_fn=None, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            net = tf.layers.batch_normalization(net, fused=True)
-            net = tf.nn.relu(net)
-            print(np.shape(net))
-
-        with tf.variable_scope("conv3") as scope:
-            net = tf.contrib.layers.conv2d(net, 64, [3, 3], activation_fn=None, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            net = tf.layers.batch_normalization(net, fused=True)
-            net = tf.nn.relu(net)
-            print(np.shape(net))
-
-        with tf.variable_scope("conv4") as scope:
-            net = tf.contrib.layers.conv2d(net, 32, [3, 3], activation_fn=None, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            net = tf.layers.batch_normalization(net, fused=True)
-            net = tf.nn.relu(net)
-            print(np.shape(net))
-
-        with tf.variable_scope("conv5") as scope:
-            net = tf.contrib.layers.conv2d(net, 16, [3, 3], activation_fn=None, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            net = tf.layers.batch_normalization(net, fused=True)
-            net = tf.nn.relu(net)
-            print(np.shape(net))
-
-        # with tf.variable_scope("conv6") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-
-        net = tf.contrib.layers.flatten(net)
-        print(np.shape(net))
-
-        # net = tf.nn.sigmoid(net)
-        # print(np.shape(net))
-
-        # net = tf.layers.dense(net, 512, activation=tf.sigmoid)
-        net = tf.layers.dense(net, 512, activation=None)
-        print(np.shape(net))
-
-    return net
-
-
 def model(input, reuse=False):
     print(np.shape(input))
     with tf.name_scope("model"):
@@ -298,121 +148,10 @@ def model(input, reuse=False):
             net = tf.nn.relu(net)
             print(np.shape(net))
 
-        # with tf.variable_scope("conv5") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 16, [3, 3], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     net = tf.layers.batch_normalization(net, fused=True)
-        #     net = tf.nn.relu(net)
-        #     print(np.shape(net))
-
-        # with tf.variable_scope("conv6") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-
         net = tf.contrib.layers.flatten(net)
         print(np.shape(net))
-
-        # net = tf.nn.sigmoid(net)
-        # print(np.shape(net))
 
         net = tf.layers.dense(net, 4096, activation=tf.sigmoid)
-        # net = tf.layers.dense(net, 512, activation=None)
-        print(np.shape(net))
-
-    return net
-
-
-def model_orig(input, reuse=False):
-    print(np.shape(input))
-    with tf.name_scope("model"):
-        with tf.variable_scope("conv1") as scope:
-            net = tf.contrib.layers.conv2d(input, 32, [7, 7], activation_fn=tf.nn.relu, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            print(np.shape(net))
-
-        with tf.variable_scope("conv2") as scope:
-            net = tf.contrib.layers.conv2d(net, 64, [5, 5], activation_fn=tf.nn.relu, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            print(np.shape(net))
-
-        with tf.variable_scope("conv3") as scope:
-            net = tf.contrib.layers.conv2d(net, 128, [3, 3], activation_fn=tf.nn.relu, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            print(np.shape(net))
-
-        with tf.variable_scope("conv4") as scope:
-            net = tf.contrib.layers.conv2d(net, 256, [2, 2], activation_fn=tf.nn.relu, padding='SAME',
-                                           weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-                                           scope=scope, reuse=reuse)
-            print(np.shape(net))
-            net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-            print(np.shape(net))
-
-        # with tf.variable_scope("conv5") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 2, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv6") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-        #
-        # with tf.variable_scope("conv7") as scope:
-        #     net = tf.contrib.layers.conv2d(net, 1, [2, 2], activation_fn=None, padding='SAME',
-        #                                    weights_initializer=tf.contrib.layers.xavier_initializer_conv2d(),
-        #                                    scope=scope, reuse=reuse)
-        #     print(np.shape(net))
-        #     net = tf.contrib.layers.max_pool2d(net, [2, 2], padding='SAME')
-        #     print(np.shape(net))
-
-        net = tf.contrib.layers.flatten(net)
         print(np.shape(net))
 
     return net
@@ -420,9 +159,8 @@ def model_orig(input, reuse=False):
 
 def contrastive_loss(model1, model2, y, left_label, right_label, margin=0.2, use_loss=False):
     label = tf.equal(left_label, right_label)
-    # label = tf.cast(label, tf.int32)
     y = tf.to_float(label)
-    # keep y as logits
+
     with tf.name_scope("contrastive_loss"):
         distance = tf.sqrt(tf.reduce_sum(tf.pow(model1 - model2, 2), 1, keepdims=True))
         similarity = y * tf.square(distance)  # keep the similar label (1) close to each other
@@ -446,10 +184,6 @@ def inference(left_input_image, right_input_image):
         right_features = model(tf.layers.batch_normalization(tf.divide(right_input_image, 255.0)))
 
     merged_features = tf.abs(tf.subtract(left_features, right_features))
-    # merged_features = tf.maximum(tf.add(-tf.subtract(left_features, right_features), margin), 0.0)
-    # merged_features = tf.maximum(margin - tf.abs(tf.subtract(left_features, right_features)), 0)
-    # merged_features = tf.maximum(tf.abs(tf.subtract(left_features, right_features)) - margin, 0)
-    # logits = tf.contrib.layers.fully_connected(merged_features, num_outputs=1, activation_fn=tf.sigmoid)
     logits = tf.contrib.layers.fully_connected(merged_features, num_outputs=1, activation_fn=None)
     logits = tf.reshape(logits, [-1])
     return logits, left_features, right_features
@@ -457,14 +191,9 @@ def inference(left_input_image, right_input_image):
 
 def loss(logits, left_label, right_label):
     label = tf.equal(left_label, right_label)
-    # label = tf.cast(label, tf.int32)
-
-    # label_float = tf.to_float(label)
     label_float = tf.cast(label, tf.float64)
 
     logits = tf.cast(logits, tf.float64)
-
-    # cross_entropy_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=label))
     cross_entropy_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=label_float))
     tf.losses.add_loss(cross_entropy_loss)
 

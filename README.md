@@ -33,6 +33,10 @@ Run the training script to train the model on the specified TFRecord file.
 ```
 $ python3 siamese_network.py
 ```
+## Pre-Trained Model
+Download thte pre-trained model weights from here:
+* [Model](https://drive.google.com/drive/folders/1n6JV36gQb9RpYuPcHPXJd2Wled_U_PNu?usp=sharing) - pre-trained model weights
+
 ## Inference
 To test the model use the Jupyter notebook provided.
 ```

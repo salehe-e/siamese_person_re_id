@@ -442,8 +442,8 @@ def inference(left_input_image, right_input_image):
 	"""
     with tf.variable_scope('feature_generator', reuse=tf.AUTO_REUSE) as sc:
 
-        left_features = model(tf.layers.batch_normalization(left_input_image / 255.0))
-        right_features = model(tf.layers.batch_normalization(right_input_image / 255.0))
+        left_features = model(tf.layers.batch_normalization(tf.divide(left_input_image, 255.0)))
+        right_features = model(tf.layers.batch_normalization(tf.divide(right_input_image, 255.0)))
 
     merged_features = tf.abs(tf.subtract(left_features, right_features))
     # merged_features = tf.maximum(tf.add(-tf.subtract(left_features, right_features), margin), 0.0)

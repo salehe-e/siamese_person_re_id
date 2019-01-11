@@ -177,8 +177,8 @@ def inference(left_input_image, right_input_image):
 	"""
     with tf.variable_scope('feature_generator', reuse=tf.AUTO_REUSE) as sc:
 
-        left_features = model(left_input_image)
-        right_features = model(right_input_image)
+        left_features = model(tf.layers.batch_normalization(tf.divide(left_input_image, 255.0)))
+        right_features = model(tf.layers.batch_normalization(tf.divide(right_input_image, 255.0)))
 
     merged_features = tf.abs(tf.subtract(left_features, right_features))
     logits = tf.contrib.layers.fully_connected(merged_features, num_outputs=1, activation_fn=None)

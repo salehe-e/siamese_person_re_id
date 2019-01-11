@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-from jupyter_helper import *
+from test_helper import *
 
 from scipy.spatial.distance import cdist
 from matplotlib import gridspec
@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
         fig = plt.figure()
         plt.title(('Similarity: %f, Dissimilarity: %f\nEuclidean Dist: %f, Logits: %f' % (similarity, dissimilarity, euc, my_logits)), loc='center')
-        if similarity > 0:
+        if my_logits > 0.0:
             textstr = 'Similar'
             props = dict(boxstyle='round', facecolor='green', alpha=0.5)
             # plt.text(0.45, 0.05, textstr, fontsize=9,

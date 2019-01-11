@@ -66,3 +66,9 @@ The following notebook runs the test on the 7 test images provided in the main d
 $ jupyter notebook test_siamese_network_jupyter_images.ipynb
 ```
 
+## To improve the results
+* Use data augmentation [AutoAugment] (https://arxiv.org/abs/1805.09501)
+* Transfer learning; use a pre-trained model such as VGG16/19 or ResNet instead of training from scratch
+* Add more layers; increase model size; train for longer
+* Experiment with the architecture and hyper-parameters
+

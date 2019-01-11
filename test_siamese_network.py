@@ -1,4 +1,4 @@
-# USAGE : $ python3 test_siamese_network.py -i1 ./0001C1T0001F001.jpg -i2 ./0001C1T0001F001.jpg
+# USAGE : $ python3 test_siamese_network.py -i1 ./img1.jpg -i2 ./img2.jpg
 
 import tensorflow as tf
 import numpy as np
@@ -34,45 +34,26 @@ if __name__ == '__main__':
     left_label = tf.placeholder(tf.float32, [None, ], 'left_label')
     right_label = tf.placeholder(tf.float32, [None, ], 'right_label')
 
-    # batch_y = (left_label == right_label)
-
     print(np.shape(left_input_im), np.shape(right_input_im))
     logits, model_left, model_right = inference(left_input_im, right_input_im)
-    # loss(logits, left_label, right_label)
-    # label_float = tf.to_float(left_label)
-    # contrastive_loss(model_left, model_right, logits, left_label, right_label, margin=0.2, use_loss=True)
-    # triplet_loss(model_left, model_left, model_right, 0.5, use_loss=True)
 
     # total_loss = tf.losses.get_total_loss()
     global_step = tf.Variable(0, trainable=False)
-
-    # params = tf.trainable_variables()
-    # gradients = tf.gradients(total_loss, params)
-
-    # optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
-    # updates = optimizer.apply_gradients(zip(gradients, params), global_step=global_step)
-
-    # updates = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(loss, global_step=global_step)
-
     global_init = tf.variables_initializer(tf.global_variables())
 
     from PIL import Image
 
     img = Image.open(img_one_path)
-    img = np.array(img)[np.newaxis, :, :, :]  # / 255.0
-    # img2 = img
+    img = np.array(img)[np.newaxis, :, :, :]
+    
     img2 = Image.open(img_two_path)
-    img2 = np.array(img2)[np.newaxis,:,:,:]# / 255.0
+    img2 = np.array(img2)[np.newaxis,:,:,:]
 
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(global_init)
         ckpt = tf.train.get_checkpoint_state("model")
         saver.restore(sess, "model_siamese/model.ckpt")
-
-        #     validation_handle = sess.run(val_iterator.string_handle())
-        #     feed_dict_val = {handle:validation_handle}
-
 
         my_logits, model_lf, model_rg = sess.run([logits, model_left, model_right], \
                                                  feed_dict={left_input_im: img, right_input_im: img2})
@@ -105,8 +86,6 @@ if __name__ == '__main__':
         if my_logits > 0.0:
             textstr = 'Similar'
             props = dict(boxstyle='round', facecolor='green', alpha=0.5)
-            # plt.text(0.45, 0.05, textstr, fontsize=9,
-            #          verticalalignment='top', bbox=props)
             fig_txt = tw.fill(tw.dedent(textstr), width=80)
             plt.figtext(0.51, 0.05, fig_txt, horizontalalignment='center',
                         fontsize=12, multialignment='center',
@@ -115,8 +94,6 @@ if __name__ == '__main__':
         else:
             textstr = 'Dissimilar'
             props = dict(boxstyle='round', facecolor='red', alpha=0.5)
-            # plt.text(0.44, 0.05, textstr, fontsize=9,
-            #          verticalalignment='top', bbox=props)
             fig_txt = tw.fill(tw.dedent(textstr), width=80)
             plt.figtext(0.51, 0.05, fig_txt, horizontalalignment='center',
                         fontsize=12, multialignment='center',

@@ -3,7 +3,12 @@ Siamese Network for Person Re-ID
 
 ## Dependencies
 ```
-TensorFlow version >=1.5
+TensorFlow version >= 1.5
+NumPy 1.14.0
+SciPy 1.0.0
+PIL 5.0.0
+IPython 6.2.1
+jupyter 1.0.0
 ```
 
 ## Dataset

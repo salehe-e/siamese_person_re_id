@@ -19,17 +19,17 @@ Download the MARS dataset from here:
 Next put the data into a directory with the following structure:
 
 ```
-mars\
-  categories\
-    0001\
+./mars/
+  categories/
+    0001/
       ....jpg
       ....jpg
       ....jpg
-    0002\
+    0002/
       ....jpg
-    0003\
+    0003/
       ....jpg
-    0004\
+    0004/
       ....jpg
     ...
 ```  

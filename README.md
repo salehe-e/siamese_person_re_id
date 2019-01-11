@@ -55,7 +55,7 @@ To test the model you can run the test script with two test images as such:
 $ python3 test_siamese_network.py --img1 /path/to/image1/ --img2 /path/to/image2
 ```
 
-Alternatively you can use the two provided Jupyter notebooks to test the network.
+Alternatively you can use the two provided IPython notebooks to test the network.
 The following notebook runs the test on 20 random validation set image pairs and displays the results.
 ```
 $ jupyter notebook test_siamese_network_jupyter_validation.ipynb

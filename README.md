@@ -1,5 +1,5 @@
 # siamese_person_re_id
-Siamese Network for Person Re-ID
+Siamese Network for Person Re-Identification in TensorFlow
 
 ## Dependencies
 ```

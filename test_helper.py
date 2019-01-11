@@ -5,7 +5,7 @@ import numpy as np
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
-def make_single_dataset(image_size=[256, 128], tfrecords_path="/home/salehe/siamese/mars/mars_validation_00000-of-00001.tfrecord", shuffle_buffer_size=2000, repeat=True, train=True):
+def make_single_dataset(image_size=[256, 128], tfrecords_path="./mars/mars_validation_00000-of-00001.tfrecord", shuffle_buffer_size=2000, repeat=True, train=True):
     """
 	Input:
 		image_size: size of input images to network

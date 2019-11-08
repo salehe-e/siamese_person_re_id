@@ -1,6 +1,10 @@
 # siamese_person_re_id
 Siamese Network for Person Re-Identification in TensorFlow
 
+## Usage
+For academic research purposes only. Please cite this GitHub repository.
+
+
 ## Dependencies
 ```
 TensorFlow version >= 1.5

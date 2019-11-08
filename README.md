@@ -49,9 +49,6 @@ $ python3 train_siamese_network.py --data /path/to/dataset/
 ```
 The updates are stored in `./train.log/` which can be seen in TensorBoard.
 
-## Using the pre-trained model
-Download the pre-trained model weights from the following link and put them in a folder named `model_siamese`.
-* [Model](https://drive.google.com/drive/folders/1n6JV36gQb9RpYuPcHPXJd2Wled_U_PNu?usp=sharing) - pre-trained model weights
 
 ## Inference
 To test the model you can run the test script with two test images as such:

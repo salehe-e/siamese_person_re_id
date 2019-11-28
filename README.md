@@ -18,7 +18,7 @@ jupyter 1.0.0
 ## Dataset
 
 Download the MARS dataset from here:
-* [MARS](http://www.liangzheng.com.cn/Project/project_mars.html) - The dataset used for training
+* [MARS](https://www.kaggle.com/twoboysandhats/mars-motion-analysis-and-reidentification-set) - The dataset used for training
 
 Next put the data into a directory with the following structure:
 
